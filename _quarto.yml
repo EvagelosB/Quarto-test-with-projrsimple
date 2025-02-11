@@ -1,0 +1,27 @@
+editor: visual
+project:
+  type: book
+  title: "SC Prac"
+  render:
+  - index.qmd
+  - Prac 1.qmd
+  output-dir: docs
+book:
+  title: Statistical Computing
+  sidebar:
+    border: true
+    background: light
+    position: right
+  navbar:
+    search: true
+    background: light
+  chapters:
+  - index.qmd
+  - Prac 1.qmd
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-location: left
+

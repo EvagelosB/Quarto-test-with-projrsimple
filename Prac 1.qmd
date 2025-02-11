@@ -1,0 +1,115 @@
+# Prac 1 Question 1: Finding the rows with missing values
+
+```{r}
+#| echo: true
+airquality[
+  is.na(airquality$Ozone) | 
+  is.na(airquality$Solar.R) | 
+  is.na(airquality$Wind) | 
+  is.na(airquality$Temp) | 
+  is.na(airquality$Month) | 
+  is.na(airquality$Day)
+  , ]
+```
+
+
+# Prac 1 Question 2: Finding the mean, sd, min, max
+
+```{r}
+#| echo: true
+mean(airquality$Ozone, na.rm=TRUE)
+mean(airquality$Temp, na.rm=TRUE)
+
+sd(airquality$Ozone, na.rm=TRUE)
+sd(airquality$Temp, na.rm=TRUE)
+
+min(airquality$Ozone, na.rm=TRUE)
+min(airquality$Temp, na.rm=TRUE)
+
+max(airquality$Ozone, na.rm=TRUE)
+max(airquality$Temp, na.rm=TRUE)
+```
+
+# Prac 1 Question 3: Estimating beta coefficient
+
+```{r}
+#| echo: true
+x<-cbind(cars$speed, 1)
+y<-cars$dist
+beta_estimate<-solve(t(x) %*% x) %*% (t(x) %*% y)
+beta_estimate
+```
+
+# Prac 1 Question 4: Linear regression beta check
+```{r}
+#| echo: true
+linear_func<-lm(dist~speed, data=cars)
+linear_func
+```
+
+
+# Prac 2 Question 1:
+```{r}
+#| echo: true
+x <- 1:100
+set.seed(1)
+e_i <- rnorm(100, 0, 0.2)
+y <- sin(x / 10) + e_i
+
+f <- 0.2  
+k <- ceiling(f * length(x))
+
+x
+y
+plot(x, y, col="blue", pch=16, main="Scatter Plot of y", xlab="x", ylab="y")
+```
+
+# Prac 2 Question 2
+```{r}
+#| echo: true
+customLowess <- function(x, y, f) {
+  k <- ceiling(f * length(x))  
+  Ysmooth <- numeric(length(x))
+  weight_s <- function(x, y, x_i, k) {
+    distances <- abs(x - x_i)
+    ordered <- order(distances)
+    neighbour <- ordered[1:k]
+    d_max <- max(distances[neighbour])
+    w <- rep(0, k)  
+    for (j in 1:k) {
+      w[j] <- ifelse(d_max == 0, 1, (1 - (distances[neighbour[j]] / d_max)^3)^3)
+    }
+    return(list(neighbourx = x[neighbour], neighboury = y[neighbour], weights = w))
+  }
+  for (i in seq_along(x)) {
+    x_i <- x[i]
+    result <- weight_s(x, y, x_i, k)
+    Xneighbours <- result$neighbourx
+    Yneighbours <- result$neighboury
+    w <- result$weights
+    sum_w <- sum(w)
+    x_mean <- (sum(w * Xneighbours) / sum_w)
+    y_mean <- sum(w * Yneighbours) / sum_w
+    num <- sum(w * (Xneighbours - x_mean) * (Yneighbours - y_mean))
+    den <- (sum(w * (Xneighbours - x_mean)^2))
+    b1 <- ifelse(den == 0, 0, num / den)  
+    b0 <- y_mean - b1 * x_mean  
+    Ysmooth[i] <- b0 + b1 * x_i
+  }
+  return(Ysmooth)
+}
+
+Ysmooth <- customLowess(x, y, f)
+plot(x, y, col="blue", pch=16, main="Scatter Plot of y", xlab="x", ylab="y")
+lines(x, Ysmooth, col="red", lwd=2) 
+```
+
+# Prac 2 Question 3
+```{r}
+#| echo: true
+qqq <- lowess(x, y, iter = 0, f=0.2)  
+plot(x, y, pch=16, col="blue",  main="LOWESS Function Output")
+lines(qqq, col="green", lwd=2)
+```
+
+
